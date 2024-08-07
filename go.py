@@ -9,10 +9,10 @@ from tqdm import tqdm
 from PIL import ImageFont, ImageDraw, Image
 
 FONT_PATH = "fonts/Roboto-Regular.ttf"  # Path to your custom font
-FONT_SIZE = 42  # Adjustable font size
+FONT_SIZE = 72  # Adjustable font size
 FONT_COLOR = (255, 255, 255, 255)  # White color in RGBA
 SHADOW_COLOR = (0, 0, 0, 255)  # Black color for shadow in RGBA
-BACKGROUND_COLOR = (33, 69, 168, 255)  # Background color in RGBA
+BACKGROUND_COLOR = (24, 136, 73, 255)  # Background color in RGBA
 
 FONT_SCALE = 0.8
 FONT_THICKNESS = 2
@@ -23,7 +23,7 @@ def textsizef(text, font):
     _, _, width, height = draw.textbbox((0, 0), text=text, font=font)
     return width, height
 
-def process_video(video_path, model_path="base", output_video_path="output.mp4"):
+def process_video(video_path, model_path="base", output_video_path="output.mp4", choice=1):
     def extract_audio(video_path, audio_path):
         print('Extracting audio')
         video = VideoFileClip(video_path)
@@ -34,8 +34,133 @@ def process_video(video_path, model_path="base", output_video_path="output.mp4")
     def transcribe_audio(model, audio_path):
         print('Transcribing audio')
         return model.transcribe(audio_path)
+    
+    def extract_frames_with_shadow(video_path, text_array, output_folder, fps):
+        print('Extracting frames with shadow')
+        cap = cv2.VideoCapture(video_path)
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        N_frames = 0
 
-    def extract_frames(video_path, text_array, output_folder, fps):
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            for i in text_array:
+                if N_frames >= i[1] and N_frames <= i[2]:
+                    text = i[0]
+                    img_pil = Image.fromarray(frame)
+                    draw = ImageDraw.Draw(img_pil)
+                    font = ImageFont.truetype(FONT_PATH, FONT_SIZE)
+
+                    # Calculate text size
+                    text_width, text_height = textsizef(text, font=font)
+                    text_x = int((width - text_width) / 2)
+                    text_y = int(height - text_height) // 2
+
+                    # Draw shadow
+                    shadow_offset = 2
+                    draw.text((text_x + shadow_offset, text_y + shadow_offset), text, font=font, fill=SHADOW_COLOR)
+
+                    # Draw text
+                    draw.text((text_x, text_y), text, font=font, fill=FONT_COLOR)
+
+                    frame = np.array(img_pil)  # Ensure numpy is imported
+                    break
+
+            cv2.imwrite(os.path.join(output_folder, str(N_frames) + ".jpg"), frame)
+            N_frames += 1
+
+        cap.release()
+        print('Frames extracted with shadow')
+
+
+    def extract_frames_with_slide(video_path, text_array, output_folder, fps):
+        print('Extracting frames with sliding text')
+        cap = cv2.VideoCapture(video_path)
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        N_frames = 0
+
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            for i in text_array:
+                if N_frames >= i[1] and N_frames <= i[2]:
+                    text = i[0]
+                    img_pil = Image.fromarray(frame)
+                    draw = ImageDraw.Draw(img_pil)
+                    font = ImageFont.truetype(FONT_PATH, FONT_SIZE)
+
+                    # Calculate text size
+                    text_width, text_height = textsizef(text, font=font)
+                    total_frames = i[2] - i[1]
+
+                    # Calculate the starting and ending x positions for the sliding effect
+                    start_x = -text_width
+                    end_x = width
+                    text_x = int(start_x + ((end_x - start_x) * (N_frames - i[1]) / total_frames))
+                    text_y = int(height - text_height) // 2
+
+                    # Draw text
+                    draw.text((text_x, text_y), text, font=font, fill=FONT_COLOR)
+
+                    frame = np.array(img_pil)  # Ensure numpy is imported
+                    break
+
+            cv2.imwrite(os.path.join(output_folder, str(N_frames) + ".jpg"), frame)
+            N_frames += 1
+
+        cap.release()
+        print('Frames extracted with sliding text')
+
+    def extract_frames_with_background(video_path, text_array, output_folder, fps):
+        print('Extracting frames with background')
+        cap = cv2.VideoCapture(video_path)
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        N_frames = 0
+
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            for i in text_array:
+                if N_frames >= i[1] and N_frames <= i[2]:
+                    text = i[0]
+                    img_pil = Image.fromarray(frame)
+                    draw = ImageDraw.Draw(img_pil)
+                    font = ImageFont.truetype(FONT_PATH, FONT_SIZE)
+
+                    # Calculate text size
+                    text_width, text_height = textsizef(text, font=font)
+                    text_x = int((width - text_width) / 2)
+                    text_y = int(height - text_height) // 2
+
+                    # Draw background rectangle
+                    margin = 10
+                    draw.rectangle(
+                        [(text_x - margin, text_y - margin), (text_x + text_width + margin, text_y + text_height + margin)],
+                        fill=BACKGROUND_COLOR
+                    )
+
+                    # Draw text
+                    draw.text((text_x, text_y), text, font=font, fill=FONT_COLOR)
+
+                    frame = np.array(img_pil)  # Ensure numpy is imported
+                    break
+
+            cv2.imwrite(os.path.join(output_folder, str(N_frames) + ".jpg"), frame)
+            N_frames += 1
+
+        cap.release()
+        print('Frames extracted with background')
+
+    """def extract_frames(video_path, text_array, output_folder, fps):
         print('Extracting frames')
         cap = cv2.VideoCapture(video_path)
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -80,7 +205,7 @@ def process_video(video_path, model_path="base", output_video_path="output.mp4")
             N_frames += 1
 
         cap.release()
-        print('Frames extracted')
+        print('Frames extracted')"""
 
     def create_video_with_subtitles(image_folder, audio_path, fps, output_video_path):
         images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]
@@ -157,10 +282,16 @@ def process_video(video_path, model_path="base", output_video_path="output.mp4")
     if not os.path.exists(image_folder):
         os.makedirs(image_folder)
 
-    extract_frames(video_path, text_array, image_folder, fps)
+    if choice == 1:
+        extract_frames_with_shadow(video_path, text_array, image_folder, fps)
+    if choice == 2:
+        extract_frames_with_background(video_path, text_array, image_folder, fps)
+    if choice == 3:
+        extract_frames_with_slide(video_path, text_array, image_folder, fps)
+
     create_video_with_subtitles(image_folder, audio_path, fps, output_video_path)
 
     print(f"Video created at {output_video_path}")
 
 # Example usage
-process_video(video_path="/home/tony/Pictures/result3.mp4", output_video_path=str(random.randint(5, 250)) + ".mp4")
+process_video(video_path="/home/tony/Pictures/result3.mp4", output_video_path=str(random.randint(5, 250)) + ".mp4", choice=2)
