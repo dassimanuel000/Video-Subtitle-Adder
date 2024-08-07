@@ -71,25 +71,25 @@ The script will generate output files with the naming convention `output_force_s
 
 - **Video 1**:
     <video width="320" height="240" controls>
-      <source src="130output_force_style.mp4" type="video/mp4">
+      <source src="render/130output_force_style.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
 
 - **Video 2**:
     <video width="320" height="240" controls>
-      <source src="38output_force_style.mp4" type="video/mp4">
+      <source src="render/38output_force_style.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
 
 - **Video 3**:
     <video width="320" height="240" controls>
-      <source src="15output_force_style.mp4" type="video/mp4">
+      <source src="render/15output_force_style.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
 
 - **Video 4**:
     <video width="320" height="240" controls>
-      <source src="47output_force_style.mp4" type="video/mp4">
+      <source src="render/47output_force_style.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
 
