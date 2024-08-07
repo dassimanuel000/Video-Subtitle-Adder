@@ -93,6 +93,23 @@ The script will generate output files with the naming convention `output_force_s
       Your browser does not support the video tag.
     </video>
 
+#### Subtitle Effects
+
+- **Effect 1**:
+    ![Effect 1](./render/1.PNG)
+
+- **Effect 2**:
+    ![Effect 2](./render/2.PNG)
+
+- **Effect 3**:
+    ![Effect 3](./render/3.PNG)
+
+- **Effect 4**:
+    ![Effect 4](./render/4.PNG)
+
+- **Effect 5**:
+    ![Effect 5](./render/5.PNG)
+    
 ## Notes
 
 - Ensure the paths in the script are correctly set to your local environment.
