@@ -2,6 +2,6 @@
 __pycache__
 test_videos
 venv
-*.mp4
+
 *.ass
 *.srt
