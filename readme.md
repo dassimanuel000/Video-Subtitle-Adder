@@ -11,6 +11,7 @@ This project allows you to add subtitles to any MP4 video using FFmpeg, OpenAI W
 - FFmpeg
 - OpenAI Whisper
 - Font file: `Montserrat-ExtraBold.ttf` (or any other desired font)
+- Missing the part of sequence text to time
 
 ## Installation
 
